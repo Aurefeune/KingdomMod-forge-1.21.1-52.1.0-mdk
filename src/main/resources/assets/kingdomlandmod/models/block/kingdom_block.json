@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "kingdomlandmod:block/kingdom_block"
+  }
+}
