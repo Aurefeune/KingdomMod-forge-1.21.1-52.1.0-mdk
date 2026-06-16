@@ -15,6 +15,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import net.avantguarde.kingdomlandmod.block.ModBlocks;
 import net.avantguarde.kingdomlandmod.items.ModItems;
+import net.avantguarde.kingdomlandmod.network.KingdomPackets;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(KingdomLandMod.MOD_ID)
@@ -47,7 +48,8 @@ public class KingdomLandMod
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-
+        // Enregistrer les packets réseau
+        KingdomPackets.register();
     }
 
     // Add the example block item to the building blocks tab
