@@ -1,14 +1,14 @@
 package net.avantguarde.kingdomlandmod.network;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.protocol.common.custom.CustomPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.avantguarde.kingdomlandmod.KingdomLandMod;
 import net.minecraft.core.BlockPos;
 
-import java.util.function.Supplier;
-
-public class CreateKingdomPacket {
+public class CreateKingdomPacket implements CustomPayload {
+    public static final ResourceLocation ID = new ResourceLocation(KingdomLandMod.MOD_ID, "create_kingdom");
+    
     private final BlockPos blockPos;
     private final String kingdomName;
 
@@ -22,23 +22,22 @@ public class CreateKingdomPacket {
         this.kingdomName = buf.readUtf(32);
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeBlockPos(this.blockPos);
         buf.writeUtf(this.kingdomName);
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
-            // Logique serveur : créer le royaume
-            net.minecraft.server.level.ServerPlayer player = context.getSender();
-            if (player != null) {
-                player.displayClientMessage(
-                        net.minecraft.network.chat.Component.literal("Fondation du royaume \"" + this.kingdomName + "\" ici !"),
-                        false
-                );
-            }
-        });
-        return true;
+    @Override
+    public ResourceLocation id() {
+        return ID;
+    }
+
+    public BlockPos getBlockPos() {
+        return this.blockPos;
+    }
+
+    public String getKingdomName() {
+        return this.kingdomName;
     }
 }
