@@ -1,12 +1,12 @@
 package net.avantguarde.kingdomlandmod.network;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.common.custom.CustomPayload;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.avantguarde.kingdomlandmod.KingdomLandMod;
 import net.minecraft.core.BlockPos;
 
-public class CreateKingdomPacket implements CustomPayload {
+public class CreateKingdomPacket implements CustomPacketPayload {
     public static final ResourceLocation ID = new ResourceLocation(KingdomLandMod.MOD_ID, "create_kingdom");
     
     private final BlockPos blockPos;
