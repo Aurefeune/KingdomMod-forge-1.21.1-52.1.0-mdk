@@ -1,27 +1,35 @@
 package net.avantguarde.kingdomlandmod.network;
 
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.network.ChannelBuilder;
+import net.minecraftforge.network.SimpleChannel;
 import net.avantguarde.kingdomlandmod.KingdomLandMod;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.PacketDistributor;
 
 public class KingdomPackets {
     private static final String PROTOCOL_VERSION = "1";
-    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new net.minecraft.resources.ResourceLocation(KingdomLandMod.MOD_ID, "messages"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
-    );
-
-    private static int packetId = 0;
+    public static final SimpleChannel CHANNEL = ChannelBuilder
+            .named(new net.minecraft.resources.ResourceLocation(KingdomLandMod.MOD_ID, "messages"))
+            .serverAccepts(PROTOCOL_VERSION, (status, version) -> true)
+            .clientAccepts(PROTOCOL_VERSION, (status, version) -> true)
+            .build();
 
     public static void register() {
-        // Enregistrer les packets C2S (Client to Server)
-        CHANNEL.messageBuilder(CreateKingdomPacket.class, packetId++, NetworkDirection.PLAY_TO_SERVER)
+        CHANNEL.messageBuilder(CreateKingdomPacket.class)
                 .decoder(CreateKingdomPacket::new)
-                .encoder(CreateKingdomPacket::toBytes)
-                .consumerMainThread(CreateKingdomPacket::handle)
-                .add();
+                .encoder(CreateKingdomPacket::write)
+                .consumerMainThreadSafe((packet, context) -> {
+                    context.enqueueWork(() -> {
+                        net.minecraft.server.level.ServerPlayer player = context.getSender();
+                        if (player != null) {
+                            player.displayClientMessage(
+                                    net.minecraft.network.chat.Component.literal("Fondation du royaume \"" + packet.getKingdomName() + "\" ici !"),
+                                    false
+                            );
+                        }
+                    });
+                })
+                .build();
     }
 }
