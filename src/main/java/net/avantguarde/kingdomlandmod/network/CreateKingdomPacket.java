@@ -33,6 +33,11 @@ public class CreateKingdomPacket implements CustomPacketPayload {
         return ID;
     }
 
+    @Override
+    public Type type() {
+        return Type.PLAY;
+    }
+
     public BlockPos getBlockPos() {
         return this.blockPos;
     }
