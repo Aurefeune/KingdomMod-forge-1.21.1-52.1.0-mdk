@@ -7,6 +7,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.avantguarde.kingdomlandmod.screen.CreateKingdomScreen;
 
 public class KingdomBlock extends Block {
 
@@ -16,8 +19,12 @@ public class KingdomBlock extends Block {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, net.minecraft.core.BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (!level.isClientSide) {
-            player.displayClientMessage(net.minecraft.network.chat.Component.literal("Fondation d'un royaume ici !"), false);
+        if (level.isClientSide) {
+            // Ouvrir le menu GUI côté client
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+                net.minecraft.client.Minecraft.getInstance().setScreen(new CreateKingdomScreen(pos));
+            });
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.SUCCESS;
     }
